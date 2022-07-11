@@ -386,7 +386,11 @@ insert_tor_policy() {
 	if [ "$chain" != "PREROUTING" ]; then
 		processPolicyWarning="${processPolicyWarning}${_WARNING_}: Please unset 'chain' or set 'chain' to 'PREROUTING' for policy '$comment'\\n"
 	fi
-	ips 'add' "${iface}" "$raddr" "${comment}: $raddr" || processPolicyError="${processPolicyError}${_ERROR_}: ipset 'add' $iface $raddr\\n"
+	if is_domain "$raddr"; then
+		ips 'add_dnsmasq' "${iface}" "$raddr" "${comment}" || processPolicyError="${processPolicyError}${_ERROR_}: ipset 'add_dnsmasq' $iface $raddr\\n"
+	else 
+		ips 'add' "${iface}" "$raddr" "${comment}: $raddr" || processPolicyError="${processPolicyError}${_ERROR_}: ipset 'add' $iface $raddr\\n"
+	fi
 	return 0
 }
 
